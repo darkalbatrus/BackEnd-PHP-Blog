@@ -1,3 +1,13 @@
+<?php
+include "./include/db.php";
+
+$query = "SELECT * FROM categories";
+$categories = $db->query($query);
+// echo "<pre>";
+// print_r($result->fetchAll());
+?>
+
+
 <!DOCTYPE html>
 <html dir="rtl" lang="fa">
 
@@ -15,7 +25,7 @@
     integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
     crossorigin="anonymous" />
 
-  <link rel="stylesheet" href="./assets/css/style.css" />
+  <link rel="stylesheet" href="/assets/css/style.css" />
 </head>
 
 <body>
@@ -29,17 +39,10 @@
       </a>
 
       <nav class="d-inline-flex mt-2 mt-md-0 me-md-auto">
+        <?php foreach ($categories as $category): ?>
           <a
-          class="fw-bold me-3 py-2 link-body-emphasis text-decoration-none"
-          href="#">طبیعت</a>
-          <a
-            class="me-3 py-2 link-body-emphasis text-decoration-none"
-            href="#">گردشگری</a>
-          <a
-            class="me-3 py-2 link-body-emphasis text-decoration-none"
-            href="#">تکنولوژی</a>
-          <a
-            class="me-3 py-2 link-body-emphasis text-decoration-none"
-            href="#">متفرقه</a>
+            class="fw-bold me-3 py-2 link-body-emphasis text-decoration-none"
+            href="#"><?= $category['title'] ?></a>
+        <?php endforeach ?>
       </nav>
     </header>
