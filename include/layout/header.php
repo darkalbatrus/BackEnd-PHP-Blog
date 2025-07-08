@@ -1,11 +1,18 @@
 <?php
 include "./include/db.php";
 
-$query = "SELECT * FROM categories";
-$categories = $db->query($query);
-// echo "<pre>";
-// print_r($result->fetchAll());
+try {
+  $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+  $query = "SELECT * FROM categories";
+  $stmt = $db->query($query);
+  $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+  echo "خطا در اتصال یا اجرای کوئری: " . $e->getMessage();
+  exit;
+}
 ?>
+
 
 
 <!DOCTYPE html>
@@ -39,10 +46,15 @@ $categories = $db->query($query);
       </a>
 
       <nav class="d-inline-flex mt-2 mt-md-0 me-md-auto">
-        <?php foreach ($categories as $category): ?>
-          <a
-            class="fw-bold me-3 py-2 link-body-emphasis text-decoration-none"
-            href="#"><?= $category['title'] ?></a>
-        <?php endforeach ?>
+        <?php if (!empty($categories) && is_array($categories)): ?>
+          <?php foreach ($categories as $category): ?>
+            <a
+              class="fw-bold me-3 py-2 link-body-emphasis text-decoration-none"
+              href="#"><?= htmlspecialchars($category['title']) ?></a>
+          <?php endforeach ?>
+        <?php else: ?>
+          <span class="text-muted">دسته‌بندی‌ای پیدا نشد</span>
+        <?php endif ?>
+
       </nav>
     </header>
