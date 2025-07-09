@@ -1,3 +1,8 @@
+<?php
+$categories = $db->query("SELECT * FROM categories");
+?>
+
+
 <div class="col-lg-4">
   <!-- Sesrch Section -->
   <div class="card">
@@ -17,34 +22,29 @@
         </div>
       </form>
     </div>
-  </div
-    <!-- Categories Section -->
+  </div>
+
+  <!-- Categories Section -->
   <div class="card mt-4">
     <div class="fw-bold fs-6 card-header">دسته بندی ها</div>
     <ul class="list-group list-group-flush p-0">
-      <li class="list-group-item">
-        <a
-          class="link-body-emphasis text-decoration-none"
-          href="#">طبیعت</a>
-      </li>
-      <li class="list-group-item">
-        <a
-          class="link-body-emphasis text-decoration-none"
-          href="#">گردشگری</a>
-      </li>
-      <li class="list-group-item">
-        <a
-          class="link-body-emphasis text-decoration-none"
-          href="#">تکنولوژی</a>
-      </li>
-      <li class="list-group-item">
-        <a
-          class="link-body-emphasis text-decoration-none"
-          href="#">متفرقه</a>
-      </li>
+      <?php if (!empty($categories)) : ?>
+        <?php foreach ($categories as $category): ?>
+          <li class="list-group-item">
+            <a
+              class="link-body-emphasis text-decoration-none"
+              href="index.php?category=<?= $category['id'] ?>"><?= $category['title'] ?></a>
+          </li>
+        <?php endforeach; ?>
+      <?php else: ?>
+        <div class="col-12">
+          <div class="alert alert-info">دسته بندی برای نمایش وجود ندارد</div>
+        </div>
+      <?php endif; ?>
     </ul>
-  </div
-    <!-- Subscribue Section -->
+  </div>
+
+  <!-- Subscribue Section -->
   <div class="card mt-4">
     <div class="card-body">
       <p class="fw-bold fs-6">عضویت در خبرنامه</p
@@ -70,8 +70,9 @@
       </div>
       </form>
     </div>
-  </div
-    <!-- About Section -->
+  </div>
+
+  <!-- About Section -->
   <div class="card mt-4">
     <div class="card-body">
       <p class="fw-bold fs-6">درباره ما</p>

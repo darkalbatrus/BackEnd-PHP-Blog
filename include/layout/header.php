@@ -50,7 +50,7 @@ try {
           <?php foreach ($categories as $category): ?>
             <a
               class="fw-bold me-3 py-2 link-body-emphasis text-decoration-none"
-              href="#"><?= htmlspecialchars($category['title']) ?></a>
+              href="index.php?category=<?= $category['id'] ?>"><?= htmlspecialchars($category['title']) ?></a>
           <?php endforeach ?>
         <?php else: ?>
           <span class="text-muted">دسته‌بندی‌ای پیدا نشد</span>
