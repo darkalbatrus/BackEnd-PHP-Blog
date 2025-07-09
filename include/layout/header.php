@@ -49,7 +49,7 @@ try {
         <?php if (!empty($categories) && is_array($categories)): ?>
           <?php foreach ($categories as $category): ?>
             <a
-              class="fw-bold me-3 py-2 link-body-emphasis text-decoration-none"
+              class="<?= (isset($_GET['category']) && $category['id'] == $_GET['category'] ? "fw-bold" : '') ?> me-3 py-2 link-body-emphasis text-decoration-none"
               href="index.php?category=<?= $category['id'] ?>"><?= htmlspecialchars($category['title']) ?></a>
           <?php endforeach ?>
         <?php else: ?>
