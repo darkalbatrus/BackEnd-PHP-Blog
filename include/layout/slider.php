@@ -1,8 +1,6 @@
 <?php
 // بارگذاری اطلاعات اسلایدها و پست‌ها در یک کوئری
 $sliders = $db->query("SELECT posts_slider.*, posts.title, posts.body, posts.image FROM posts_slider JOIN posts ON posts_slider.post_id = posts.id")->fetchAll(PDO::FETCH_ASSOC);
-echo "<pre>";
-print_r($sliders);
 ?>
 
 <section>
