@@ -57,9 +57,7 @@ if (isset($_GET['post'])) {
                                 </div>
                             </div>
                         </div>
-
                         <hr class="mt-4" />
-
                         <!-- Comment Section -->
                         <div class="col">
                             <!-- Comment Form -->
@@ -92,78 +90,37 @@ if (isset($_GET['post'])) {
                             </div>
 
                             <hr class="mt-4" />
+                            <?php
+                            $postId = $post['id'];
+                            $comments =   $db->prepare("SELECT * From comments WHERE post_id = :id AND status ='1'");
+                            $comments->execute(['id' => $postId]);
+                            ?>
+
                             <!-- Comment Content -->
-                            <p class="fw-bold fs-6">تعداد کامنت : 3</p>
+                            <p class="fw-bold fs-6">تعداد کامنت : <?= $comments->rowCount() ?></p>
+                            <?php foreach ($comments as $comment): ?>
+                                <div class="card bg-light-subtle mb-3">
+                                    <div class="card-body">
+                                        <div
+                                            class="d-flex align-items-center">
+                                            <img
+                                                src="./assets/images/profile.png"
+                                                width="45"
+                                                height="45"
+                                                alt="user-profle" />
 
-                            <div class="card bg-light-subtle mb-3">
-                                <div class="card-body">
-                                    <div
-                                        class="d-flex align-items-center">
-                                        <img
-                                            src="./assets/images/profile.png"
-                                            width="45"
-                                            height="45"
-                                            alt="user-profle" />
+                                            <h5
+                                                class="card-title me-2 mb-0">
+                                                <?= $comment['name'] ?>
+                                            </h5>
+                                        </div>
 
-                                        <h5
-                                            class="card-title me-2 mb-0">
-                                            محمد صالحی
-                                        </h5>
+                                        <p class="card-text pt-3 pr-3">
+                                            <?= $comment['comment'] ?>
+                                        </p>
                                     </div>
-
-                                    <p class="card-text pt-3 pr-3">
-                                        لورم ایپسوم متن ساختگی با تولید
-                                        سادگی نامفهوم از صنعت چاپ و با
-                                        استفاده از طراحان گرافیک است.
-                                    </p>
                                 </div>
-                            </div>
-
-                            <div class="card bg-light-subtle mb-3">
-                                <div class="card-body">
-                                    <div
-                                        class="d-flex align-items-center">
-                                        <img
-                                            src="./assets/images/profile.png"
-                                            width="45"
-                                            height="45"
-                                            alt="user-profle" />
-
-                                        <h5
-                                            class="card-title me-2 mb-0">
-                                            متین سیدی
-                                        </h5>
-                                    </div>
-
-                                    <p class="card-text pt-3 pr-3">
-                                        لورم ایپسوم متن ساختگی با تولید
-                                        سادگی نامفهوم از صنعت چاپ
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="card bg-light-subtle mb-3">
-                                <div class="card-body">
-                                    <div
-                                        class="d-flex align-items-center">
-                                        <img
-                                            src="./assets/images/profile.png"
-                                            width="45"
-                                            height="45"
-                                            alt="user-profle" />
-
-                                        <h5
-                                            class="card-title me-2 mb-0">
-                                            زهرا عزیزی
-                                        </h5>
-                                    </div>
-
-                                    <p class="card-text pt-3 pr-3">
-                                        لورم ایپسوم متن ساختگی با تولید
-                                        سادگی
-                                    </p>
-                                </div>
-                            </div>
+                            <?php endforeach ?>
                         </div>
                     </div>
                 </div>
