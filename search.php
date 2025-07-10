@@ -54,7 +54,7 @@ if (isset($_GET['search'])) {
                                                     <div
                                                         class="d-flex justify-content-between align-items-center">
                                                         <a
-                                                            href="single.html"
+                                                            href="single.php?post=<?= $post['id'] ?>"
                                                             class="btn btn-sm btn-dark">مشاهده</a>
 
                                                         <p class="fs-7 mb-0">
