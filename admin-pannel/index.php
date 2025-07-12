@@ -1,5 +1,23 @@
 <?php
 include "./include/layout/header.php";
+if (isset($_GET['entity']) && isset($_GET['action']) && isset($_GET['id'])) {
+    $entity = $_GET['entity'];
+    $action = $_GET['action'];
+    $id = $_GET['id'];
+
+    switch ($entity) {
+        case 'post':
+            $query = $db->prepare('DELETE FROM posts WHERE id =:id');
+            break;
+        case 'comment':
+            $query = $db->prepare('DELETE FROM comments WHERE id =:id');
+            break;
+        case 'category':
+            $query = $db->prepare('DELETE FROM categories WHERE id =:id');
+            break;
+    }
+    $query->execute(['id' => $id]);
+};
 $posts = $db->query("SELECT * FROM posts ORDER BY id DESC LIMIT 5");
 $comments = $db->query("SELECT * FROM comments ORDER BY id DESC LIMIT 5");
 $categories = $db->query("SELECT * FROM categories LIMIT 5");
@@ -50,7 +68,7 @@ $categories = $db->query("SELECT * FROM categories LIMIT 5");
                                                 href="#"
                                                 class="btn btn-sm btn-outline-dark">ویرایش</a>
                                             <a
-                                                href="#"
+                                                href="index.php?entity=post&action=delete&id=<?= $post['id'] ?>"
                                                 class="btn btn-sm btn-outline-danger">حذف</a>
                                         </td>
                                     </tr>
@@ -96,7 +114,7 @@ $categories = $db->query("SELECT * FROM categories LIMIT 5");
                                                     class="btn btn-sm btn-outline-dark">تایید کامنت</a>
                                             <?php endif ?>
                                             <a
-                                                href="#"
+                                                href="index.php?entity=comment&action=delete&id=<?= $comment['id'] ?>"
                                                 class="btn btn-sm btn-outline-danger">حذف</a>
                                         </td>
                                     </tr>
@@ -134,7 +152,7 @@ $categories = $db->query("SELECT * FROM categories LIMIT 5");
                                                 href="#"
                                                 class="btn btn-sm btn-outline-dark">ویرایش</a>
                                             <a
-                                                href="#"
+                                                href="index.php?entity=category&action=delete&id=<?= $categorie['id'] ?>"
                                                 class="btn btn-sm btn-outline-danger">حذف</a>
                                         </td>
                                     </tr>
