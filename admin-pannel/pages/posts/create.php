@@ -20,6 +20,24 @@ if (isset($_POST['addPost'])) {
     if (empty(trim($_POST['body']))) {
         $invalidInputBody = 'متن مقاله الزامی است';
     }
+    if (!empty(trim($_POST['title'])) && !empty(trim($_POST['author'])) && !empty(trim($_FILES['image']['name'])) && !empty(trim($_POST['body']))) {
+        $title = $_POST['title'];
+        $author = $_POST['author'];
+        $nameImg = time() . "-" . $_FILES['image']['name'];
+        $categoryId = $_POST['categoryId'];
+        $body = $_POST['body'];
+
+        $tmpName = $_FILES['image']['tmp_name'];
+        if (move_uploaded_file($tmpName, "../../../uploads/posts/$nameImg")) {
+            $postSend = $db->prepare("INSERT INTO posts (title,body,category_id,author,image) VALUES (:title,:body,:category_id,:author,:image)");
+            $postSend->execute(['title' => $title, 'body' => $body, 'category_id' => $categoryId, 'author' => $author, 'image' => $nameImg]);
+
+            header("Location:index.php");
+            exit();
+        } else {
+            echo "Upload Error ...";
+        }
+    }
 }
 ?>
 
