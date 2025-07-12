@@ -58,7 +58,7 @@ $categories = $db->query("SELECT * FROM categories LIMIT 5");
                         </thead>
                         <tbody>
                             <?php if (!$posts->rowCount() >  0): ?>
-                                <div class="clo">
+                                <div class="col">
                                     <div class="alert alert-danger">مقاله ای یافت نشد ...</div>
                                 </div>
                             <?php else: ?>
@@ -98,7 +98,7 @@ $categories = $db->query("SELECT * FROM categories LIMIT 5");
                         </thead>
                         <tbody>
                             <?php if (!$comments->rowCount() >  0): ?>
-                                <div class="clo">
+                                <div class="col">
                                     <div class="alert alert-danger">نظری یافت نشد ...</div>
                                 </div>
                             <?php else: ?>
@@ -143,7 +143,7 @@ $categories = $db->query("SELECT * FROM categories LIMIT 5");
                         </thead>
                         <tbody>
                             <?php if (!$categories->rowCount() >  0): ?>
-                                <div class="clo">
+                                <div class="col">
                                     <div class="alert alert-danger">دسته بندی ای یافت نشد ...</div>
                                 </div>
                             <?php else: ?>
