@@ -5,16 +5,20 @@ if (isset($_GET['entity']) && isset($_GET['action']) && isset($_GET['id'])) {
     $action = $_GET['action'];
     $id = $_GET['id'];
 
-    switch ($entity) {
-        case 'post':
-            $query = $db->prepare('DELETE FROM posts WHERE id =:id');
-            break;
-        case 'comment':
-            $query = $db->prepare('DELETE FROM comments WHERE id =:id');
-            break;
-        case 'category':
-            $query = $db->prepare('DELETE FROM categories WHERE id =:id');
-            break;
+    if ($action == "delete") {
+        switch ($entity) {
+            case 'post':
+                $query = $db->prepare('DELETE FROM posts WHERE id =:id');
+                break;
+            case 'comment':
+                $query = $db->prepare('DELETE FROM comments WHERE id =:id');
+                break;
+            case 'category':
+                $query = $db->prepare('DELETE FROM categories WHERE id =:id');
+                break;
+        }
+    } elseif ($action == "approve") {
+        $query = $db->prepare("UPDATE comments SET status = '1' WHERE id = :id");
     }
     $query->execute(['id' => $id]);
 };
@@ -110,8 +114,8 @@ $categories = $db->query("SELECT * FROM categories LIMIT 5");
                                                     class="btn btn-sm btn-outline-dark disabled">تایید شده</a>
                                             <?php else: ?>
                                                 <a
-                                                    href="#"
-                                                    class="btn btn-sm btn-outline-dark">تایید کامنت</a>
+                                                    href="index.php?entity=comment&action=approve&id=<?= $comment['id'] ?>"
+                                                    class="btn btn-sm btn-outline-info">تایید کامنت</a>
                                             <?php endif ?>
                                             <a
                                                 href="index.php?entity=comment&action=delete&id=<?= $comment['id'] ?>"
