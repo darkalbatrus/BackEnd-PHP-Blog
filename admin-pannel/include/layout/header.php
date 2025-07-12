@@ -1,5 +1,6 @@
 <?php
 include(__DIR__ . "/../db.php");
+$path = $_SERVER['REQUEST_URI'];
 ?>
 
 <!DOCTYPE html>
@@ -18,8 +19,11 @@ include(__DIR__ . "/../db.php");
     rel="stylesheet"
     integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
     crossorigin="anonymous" />
-
-  <link rel="stylesheet" href="./assets/css/style.css" />
+  <?php if (str_contains($path, "pages")): ?>
+    <link rel="stylesheet" href="../../assets/css/style.css" />
+  <?php else: ?>
+    <link rel="stylesheet" href="./assets/css/style.css" />
+  <?php endif ?>
 </head>
 
 <body>
