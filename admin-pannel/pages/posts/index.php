@@ -29,7 +29,7 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
                 <h1 class="fs-3 fw-bold">مقالات</h1>
 
                 <div class="btn-toolbar mb-2 mb-md-0">
-                    <a href="./create.html" class="btn btn-sm btn-dark">
+                    <a href="./create.php" class="btn btn-sm btn-dark">
                         ایجاد مقاله
                     </a>
                 </div>
