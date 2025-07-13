@@ -1,5 +1,6 @@
 <?php
 include "./include/layout/header.php";
+
 if (isset($_GET['entity']) && isset($_GET['action']) && isset($_GET['id'])) {
     $entity = $_GET['entity'];
     $action = $_GET['action'];
@@ -69,7 +70,7 @@ $categories = $db->query("SELECT * FROM categories LIMIT 5");
                                         <td><?= $post['author'] ?></td>
                                         <td>
                                             <a
-                                                href="#"
+                                                href="index.php?entity=posts&action=approve&id=<?= $post['id'] ?>"
                                                 class="btn btn-sm btn-outline-dark">ویرایش</a>
                                             <a
                                                 href="index.php?entity=post&action=delete&id=<?= $post['id'] ?>"

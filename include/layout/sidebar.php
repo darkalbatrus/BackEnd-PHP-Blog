@@ -48,6 +48,7 @@ $categories = $db->query("SELECT * FROM categories");
   <?php
   $invalidInputName = '';
   $invalidInputEmail = '';
+  $successMessage = '';
 
   if (isset($_POST['subscribe'])) {
     if (empty(trim($_POST['name']))) {

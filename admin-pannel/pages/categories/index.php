@@ -52,7 +52,7 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
                                         <th><?= $category['id'] ?></th>
                                         <td><?= $category['title'] ?></td>
                                         <td>
-                                            <a href="./edit.php" class="btn btn-sm btn-outline-dark">ویرایش</a>
+                                            <a href="./edit.php?id=<?= $category['id'] ?>" class="btn btn-sm btn-outline-dark">ویرایش</a>
                                             <a href="index.php?action=delete&id=<?= $category['id'] ?>" class="btn btn-sm btn-outline-danger">حذف</a>
                                         </td>
                                     </tr>

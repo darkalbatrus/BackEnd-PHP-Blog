@@ -3,7 +3,7 @@ include "../../include/layout/header.php";
 $posts = $db->query("SELECT * FROM posts ORDER BY id DESC");
 
 if (isset($_GET['action']) && isset($_GET['id'])) {
-    $action = $_GET['action'];
+    $action = $_GET['`action`'];
     $id = $_GET['id'];
     $query = $db->prepare("DELETE FROM posts WHERE id =:id");
     $query->execute(['id' => $id]);

@@ -8,6 +8,8 @@ if (isset($_GET['id'])) {
     $category->execute(['id' => $categoryId]);
     $category = $category->fetch();
 }
+echo "<pre>";
+print_r($category);
 
 if (isset($_POST['editCategory'])) {
     if (!empty(trim($_POST['title']))) {
