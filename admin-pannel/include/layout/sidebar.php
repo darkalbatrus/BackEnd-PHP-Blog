@@ -40,7 +40,7 @@ $path = $_SERVER['REQUEST_URI'];
         <li class="nav-item">
           <a
             class="nav-link link-body-emphasis text-decoration-none d-flex align-items-center gap-2 <?= str_contains($path, 'categories') ?  'text-secondary' : '' ?>"
-            href="./pages/categories/index.html">
+            href="/php-course-blog-template/admin-pannel/pages/categories/index.php">
             <i
               class="bi bi-folder-fill fs-4 "></i>
             <span class="fw-bold">دسته بندی</span>
