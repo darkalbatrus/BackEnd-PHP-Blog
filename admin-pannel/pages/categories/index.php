@@ -28,7 +28,7 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
                 <h1 class="fs-3 fw-bold">دسته بندی ها</h1>
 
                 <div class="btn-toolbar mb-2 mb-md-0">
-                    <a href="./create.html" class="btn btn-sm btn-dark">
+                    <a href="./create.php" class="btn btn-sm btn-dark">
                         ایجاد دسته بندی
                     </a>
                 </div>
@@ -52,7 +52,7 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
                                         <th><?= $category['id'] ?></th>
                                         <td><?= $category['title'] ?></td>
                                         <td>
-                                            <a href="./edit.html" class="btn btn-sm btn-outline-dark">ویرایش</a>
+                                            <a href="./edit.php" class="btn btn-sm btn-outline-dark">ویرایش</a>
                                             <a href="index.php?action=delete&id=<?= $category['id'] ?>" class="btn btn-sm btn-outline-danger">حذف</a>
                                         </td>
                                     </tr>
