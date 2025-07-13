@@ -8,6 +8,47 @@ if (isset($_GET['id'])) {
     $post = $post->fetch();
     $categories = $db->query("SELECT * FROM categories");
 }
+
+$invalidInputTitle = '';
+$invalidInputAuthor = '';
+$invalidInputBody = '';
+if (isset($_POST['editPost'])) {
+    if (empty(trim($_POST['title']))) {
+        $invalidInputTitle = 'فیلد عنوان الزامی است';
+    }
+    if (empty(trim($_POST['author']))) {
+        $invalidInputAuthor = 'فیلد نام نویسنده الزامی است';
+    }
+    if (empty(trim($_POST['body']))) {
+        $invalidInputBody = 'متن مقاله الزامی است';
+    }
+    if (!empty(trim($_POST['title'])) && !empty(trim($_POST['author'])) && !empty(trim($_POST['body']))) {
+        $title = $_POST['title'];
+        $author = $_POST['author'];
+        $body = $_POST['body'];
+        $categoryId = $_POST['categoryId'];
+
+        if (!empty(trim($_FILES['image']['name']))) {
+            $nameImage = time() . "_" . $_FILES['image']['name'];
+            $tmpName = $_FILES['image']['tmp_name'];
+
+            if (move_uploaded_file($tmpName, "../../../uploads/posts/$nameImage")) {
+                $postUpdate = $db->prepare("UPDATE posts SET title =:title, author=:author, category_id=:categoryId, body=:body, image=:image WHERE id=:id");
+                $postUpdate->execute(['title' => $title, 'author' => $author, 'categoryId' => $categoryId, 'body' => $body, 'id' => $postId, 'image' => $nameImage]);
+            } else {
+                echo "Upload Error";
+            }
+        } else {
+            $postUpdate = $db->prepare("UPDATE posts SET title =:title, author=:author, category_id=:categoryId, body=:body WHERE id=:id");
+            $postUpdate->execute(['title' => $title, 'author' => $author, 'categoryId' => $categoryId, 'body' => $body, 'id' => $postId]);
+        }
+
+
+        header("Location:index.php");
+        exit();
+    }
+}
+
 ?>
 
 
@@ -35,6 +76,7 @@ if (isset($_GET['id'])) {
                             name="title"
                             class="form-control"
                             value="<?= $post['title'] ?>" />
+                        <div class="form-text text-danger"><?= $invalidInputTitle ?></div>
                     </div>
 
                     <div class="col-12 col-sm-6 col-md-4">
@@ -44,6 +86,7 @@ if (isset($_GET['id'])) {
                             type="text"
                             class="form-control"
                             value="<?= $post['author'] ?>" />
+                        <div class="form-text text-danger"><?= $invalidInputAuthor ?></div>
                     </div>
 
                     <div class="col-12 col-sm-6 col-md-4">
@@ -69,6 +112,7 @@ if (isset($_GET['id'])) {
                         <textarea class="form-control" name="body" rows="8">
                             <?= $post['body'] ?>
                         </textarea>
+                        <div class="form-text text-danger"><?= $invalidInputBody ?></div>
                     </div>
 
 
