@@ -2,18 +2,17 @@
 include "../../include/layout/header.php";
 $posts = $db->query("SELECT * FROM posts ORDER BY id DESC");
 
-if (isset($_GET['action']) && isset($_GET['id'])) {
-    $action = $_GET['`action`'];
-    $id = $_GET['id'];
-    $query = $db->prepare("DELETE FROM posts WHERE id =:id");
-    $query->execute(['id' => $id]);
+if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
+    $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
-    header("Location:index.php");
+    if ($id !== false) {
+        $query = $db->prepare("DELETE FROM posts WHERE id = :id");
+        $query->execute(['id' => $id]);
+    }
+    header("Location: index.php");
     exit();
 }
 ?>
-
-
 
 <div class="container-fluid">
     <div class="row">
@@ -55,9 +54,9 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
                             <?php else: ?>
                                 <?php foreach ($posts as $post): ?>
                                     <tr>
-                                        <th><?= $post['id'] ?></th>
-                                        <td><?= $post['title'] ?></td>
-                                        <td><?= $post['author'] ?></td>
+                                        <th><?= htmlspecialchars($post['id']) ?></th>
+                                        <td><?= htmlspecialchars($post['title']) ?></td>
+                                        <td><?= htmlspecialchars($post['author']) ?></td>
                                         <td>
                                             <a
                                                 href="./edit.php?id=<?= $post['id'] ?>"
