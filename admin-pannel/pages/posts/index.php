@@ -60,7 +60,7 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
                                         <td><?= $post['author'] ?></td>
                                         <td>
                                             <a
-                                                href="#"
+                                                href="./edit.php?id=<?= $post['id'] ?>"
                                                 class="btn btn-sm btn-outline-dark">ویرایش</a>
                                             <a
                                                 href="index.php?entity=post&action=delete&id=<?= $post['id'] ?>"
