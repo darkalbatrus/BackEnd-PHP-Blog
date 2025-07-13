@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-include "../../include/config.php";
 include "../../include/db.php";
 
 $invalidInputEmail = '';
@@ -9,11 +8,11 @@ $invalidInputPassword = '';
 
 if (isset($_POST['login'])) {
     if (empty(trim($_POST['email']))) {
-        $invalidInputEmail = "فیلد ایمیل ضروری هست";
+        $invalidInputEmail = "ایمیل ضروری است";
     }
 
     if (empty(trim($_POST['password']))) {
-        $invalidInputPassword = "فیلد رمز عبور ضروری هست";
+        $invalidInputPassword = "رمز عبور ضروری است";
     }
 
     if (!empty(trim($_POST['email'])) && !empty(trim($_POST['password']))) {
