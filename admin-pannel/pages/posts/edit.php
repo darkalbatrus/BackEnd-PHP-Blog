@@ -1,14 +1,17 @@
 <?php
 include "../../include/layout/header.php";
 
-if (isset($_GET['id'])) {
+if (!isset($_GET['id']) || empty($_GET['id'])) {
+    header("Location:index.php");
+    exit;
+} elseif (isset($_GET['id'])) {
     $postId = $_GET['id'];
     $post = $db->prepare("SELECT * FROM posts WHERE id = :id");
     $post->execute(['id' => $postId]);
     $post = $post->fetch();
-    
+
     $categories = $db->query("SELECT * FROM categories");
-    
+
     $image = $db->prepare("SELECT * FROM files WHERE id = :id");
     $image->execute(['id' => $post['file_id']]);
     $image = $image->fetch();
