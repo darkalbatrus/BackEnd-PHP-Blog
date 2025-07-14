@@ -6,53 +6,90 @@ $invalidInputTitle = '';
 $invalidInputAuthor = '';
 $invalidInputImage = '';
 $invalidInputBody = '';
-if (isset($_POST['addPost'])) {
+// echo "<pre>";
+// print_r($imageFile = $_FILES['image']);
 
+if (isset($_POST['addPost'])) {
     if (empty(trim($_POST['title']))) {
         $invalidInputTitle = 'فیلد عنوان الزامی است';
+    } elseif (mb_strlen(trim($_POST['title'])) < 3) {
+        $invalidInputTitle = 'حداقل 3 کاراکتر باشد';
+    } elseif (mb_strlen(trim($_POST['title'])) > 20) {
+        $invalidInputTitle = 'حداکثر 20 کاراکتر باشد';
     }
+
     if (empty(trim($_POST['author']))) {
         $invalidInputAuthor = 'فیلد نام نویسنده الزامی است';
+    } elseif (mb_strlen(trim($_POST['author'])) < 3) {
+        $invalidInputAuthor = 'حداقل 3 کاراکتر باشد';
+    } elseif (mb_strlen(trim($_POST['author'])) > 20) {
+        $invalidInputAuthor = 'حداکثر 20 کاراکتر باشد';
     }
+
     if (empty(trim($_FILES['image']['name']))) {
         $invalidInputImage = 'عکس مقاله الزامی است';
+    } else {
+        $allowType = ['image/png', 'image/jpg', 'image/jpeg'];
+        $fileType = mime_content_type($_FILES['image']['tmp_name']);
+
+        if (!in_array($fileType, $allowType)) {
+            $invalidInputImage = 'فرمت عکس معتبر نیست';
+        } else {
+            $fileSize = $_FILES['image']['size'];
+
+            if ($fileSize < 1 * 1024 * 1024) {
+                $invalidInputImage = "حداقل سایز عکس 3 مگابایت باشد";
+            } elseif ($fileSize > 10 * 1024 * 1024) {
+                $invalidInputImage = "حداکثر سایز عکس 10 مگابایت باشد";
+            }
+        }
     }
+
+
     if (empty(trim($_POST['body']))) {
         $invalidInputBody = 'متن مقاله الزامی است';
+    } elseif (mb_strlen(trim($_POST['body'])) < 10) {
+        $invalidInputBody = 'حداقل 10 کاراکتر باشد';
+    } elseif (mb_strlen(trim($_POST['body'])) > 1000) {
+        $invalidInputBody = 'حداکثر 1000 کاراکتر باشد';
     }
-    if (!empty(trim($_POST['title'])) && !empty(trim($_POST['author'])) && !empty(trim($_FILES['image']['name'])) && !empty(trim($_POST['body']))) {
-        $title = $_POST['title'];
-        $author = $_POST['author'];
-        $nameImg = time() . "-" . $_FILES['image']['name'];
+
+    if (empty($invalidInputTitle) && empty($invalidInputAuthor) && empty($invalidInputImage) && empty($invalidInputBody)) {
+        $title = htmlspecialchars($_POST['title']);
+        $author = htmlspecialchars($_POST['author']);
+        // $nameImg = time() . "-" . basename($_FILES['image']['name']);
+        $imgName = time() . "-" . basename($_FILES['image']['name']);
+        $imgType = $_FILES['image']['type'];
+        $imgSize = $_FILES['image']['size'];
         $categoryId = $_POST['categoryId'];
-        $body = $_POST['body'];
+        $body = htmlspecialchars($_POST['body']);
 
         $tmpName = $_FILES['image']['tmp_name'];
-        if (move_uploaded_file($tmpName, "../../../uploads/posts/$nameImg")) {
-            $postSend = $db->prepare("INSERT INTO posts (title,body,category_id,author,image) VALUES (:title,:body,:category_id,:author,:image)");
-            $postSend->execute(['title' => $title, 'body' => $body, 'category_id' => $categoryId, 'author' => $author, 'image' => $nameImg]);
+        if (move_uploaded_file($tmpName, "../../../uploads/posts/$imgName")) {
+            $imgSend = $db->prepare("INSERT INTO files (name,size,type) VALUES (:name, :size , :type)");
+            $imgSend->execute(['name' => $imgName, 'type' => $imgType, 'size' => $imgSize]);
+            $imgId = $db->query("SELECT id FROM files WHERE name = '$imgName'")->fetch();
+            $imgId = $imgId['id'];
+            $postSend = $db->prepare("INSERT INTO posts (title, body, category_id, author, file_id) VALUES (:title, :body, :category_id, :author, :file_id)");
+            $postSend->execute(['title' => $title, 'body' => $body, 'category_id' => $categoryId, 'author' => $author, 'file_id' => $imgId]);
 
-            header("Location:index.php");
+            header("Location: index.php");
             exit();
         } else {
-            echo "Upload Error ...";
+            echo "خطا در بارگذاری تصویر ...";
         }
     }
 }
 ?>
 
-
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar Section -->
-        <?php
-        include "../../include/layout/sidebar.php";
-        ?>
+        <?php include "../../include/layout/sidebar.php"; ?>
 
         <!-- Main Section -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <div
-                class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h1 class="fs-3 fw-bold">ایجاد مقاله</h1>
             </div>
 
@@ -78,9 +115,9 @@ if (isset($_POST['addPost'])) {
                                 <option value="1" disabled>دسته بندی یافت نشد</option>
                             <?php else: ?>
                                 <?php foreach ($categories as $category): ?>
-                                    <option value="<?= $category['id'] ?>"><?= $category['title'] ?></option>
-                                <?php endforeach ?>
-                            <?php endif ?>
+                                    <option value="<?= htmlspecialchars($category['id']) ?>"><?= htmlspecialchars($category['title']) ?></option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </select>
                     </div>
 
@@ -92,17 +129,12 @@ if (isset($_POST['addPost'])) {
 
                     <div class="col-12">
                         <label for="formFile" class="form-label">متن مقاله</label>
-                        <textarea
-                            name="body"
-                            class="form-control"
-                            rows="6"></textarea>
+                        <textarea name="body" class="form-control" rows="6"></textarea>
                         <div class="form-text text-danger"><?= $invalidInputBody ?></div>
                     </div>
 
                     <div class="col-12">
-                        <button type="submit" class="btn btn-dark" name="addPost">
-                            ایجاد
-                        </button>
+                        <button type="submit" class="btn btn-dark" name="addPost">ایجاد</button>
                     </div>
                 </form>
             </div>
@@ -110,6 +142,4 @@ if (isset($_POST['addPost'])) {
     </div>
 </div>
 
-<?php
-include "../../include/layout/footer.php";
-?>
+<?php include "../../include/layout/footer.php"; ?>
