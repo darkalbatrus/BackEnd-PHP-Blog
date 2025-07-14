@@ -6,11 +6,31 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
     $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
     if ($id !== false) {
-        $query = $db->prepare("DELETE FROM posts WHERE id = :id");
-        $query->execute(['id' => $id]);
+        $fileId = $db->prepare("SELECT file_id FROM posts WHERE id = :id");
+        $fileId->execute(['id' => $id]);
+        $fileId = $fileId->fetchColumn();
+
+
+        if ($fileId) {
+            $imageName = $db->prepare("SELECT name FROM files WHERE id = :id");
+            $imageName->execute(['id' => $fileId]);
+            $imageName = $imageName->fetchColumn();
+
+            $filePath = "../../../uploads/posts/" . $imageName;
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+
+            $deleteFile = $db->prepare("DELETE FROM files WHERE id = :id");
+            $deleteFile->execute(['id' => $fileId]);
+        }
+
+        $deletePost = $db->prepare("DELETE FROM posts WHERE id = :id");
+        $deletePost->execute(['id' => $id]);
+
+        header("Location: index.php");
+        exit();
     }
-    header("Location: index.php");
-    exit();
 }
 ?>
 
@@ -48,9 +68,13 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
                         </thead>
                         <tbody>
                             <?php if (!$posts->rowCount() >  0): ?>
-                                <div class="col">
-                                    <div class="alert alert-danger">مقاله ای یافت نشد ...</div>
-                                </div>
+                                <tr>
+                                    <td colspan="4">
+                                        <div class="alert alert-danger text-center m-0">
+                                            مقاله‌ای یافت نشد ...
+                                        </div>
+                                    </td>
+                                </tr>
                             <?php else: ?>
                                 <?php foreach ($posts as $post): ?>
                                     <tr>
