@@ -3,23 +3,23 @@ include "../../include/layout/header.php";
 
 $comments = $db->query("SELECT * FROM comments ORDER BY id DESC");
 
-if (isset($_GET['action']) && isset($_GET['id'])) {
-
+if (isset($_GET['action'], $_GET['id'])) {
     $action = $_GET['action'];
-    $id = $_GET['id'];
+    $id = (int)$_GET['id'];
 
-    if ($action == "delete") {
+    if ($action === "delete") {
         $query = $db->prepare('DELETE FROM comments WHERE id = :id');
+    } elseif ($action === "approve") {
+        $query = $db->prepare("UPDATE comments SET status = '1' WHERE id = :id");
     } else {
-        $query = $db->prepare("UPDATE comments SET status='1' WHERE id = :id");
+        header("Location: index.php");
+        exit();
     }
 
     $query->execute(['id' => $id]);
-
-    header("Location:index.php");
+    header("Location: index.php");
     exit();
 }
-
 ?>
 
 <div class="container-fluid">

@@ -1,21 +1,27 @@
 <?php
 include "../../include/layout/header.php";
 
-if (!isset($_GET['id']) || empty($_GET['id'])) {
-    header("Location:index.php");
+if (!isset($_GET['id']) || empty(trim($_GET['id']))) {
+    header("Location: index.php");
     exit;
-} elseif (isset($_GET['id'])) {
-    $postId = $_GET['id'];
-    $post = $db->prepare("SELECT * FROM posts WHERE id = :id");
-    $post->execute(['id' => $postId]);
-    $post = $post->fetch();
-
-    $categories = $db->query("SELECT * FROM categories");
-
-    $image = $db->prepare("SELECT * FROM files WHERE id = :id");
-    $image->execute(['id' => $post['file_id']]);
-    $image = $image->fetch();
 }
+
+$postId = trim($_GET['id']);
+
+$post = $db->prepare("SELECT * FROM posts WHERE id = :id");
+$post->execute(['id' => $postId]);
+$post = $post->fetch();
+
+if (!$post) {
+    header("Location: index.php");
+    exit;
+}
+
+$categories = $db->query("SELECT * FROM categories");
+
+$image = $db->prepare("SELECT * FROM files WHERE id = :id");
+$image->execute(['id' => $post['file_id']]);
+$image = $image->fetch();
 
 $invalidInputTitle = '';
 $invalidInputAuthor = '';
@@ -23,36 +29,46 @@ $invalidInputBody = '';
 $invalidInputImage = '';
 
 if (isset($_POST['editPost'])) {
-    if (empty(trim($_POST['title']))) {
+    $title = trim($_POST['title']);
+    $author = trim($_POST['author']);
+    $body = trim($_POST['body']);
+    $categoryId = $_POST['categoryId'];
+    $imageId = $image['id'];
+
+    if (empty($title)) {
         $invalidInputTitle = 'فیلد عنوان الزامی است';
-    } elseif (mb_strlen(trim($_POST['title']), 'UTF-8') < 3) {
+    } elseif (mb_strlen($title, 'UTF-8') < 3) {
         $invalidInputTitle = 'حداقل 3 کاراکتر باشد';
-    } elseif (mb_strlen(trim($_POST['title']), 'UTF-8') > 20) {
+    } elseif (mb_strlen($title, 'UTF-8') > 20) {
         $invalidInputTitle = 'حداکثر 20 کاراکتر باشد';
+    } elseif (!preg_match('/^[\p{L}0-9\s]+$/u', $title)) {
+        $invalidInputTitle = 'فقط حروف و اعداد مجاز هستند';
     }
 
-    if (empty(trim($_POST['author']))) {
+    if (empty($author)) {
         $invalidInputAuthor = 'فیلد نام نویسنده الزامی است';
-    } elseif (mb_strlen(trim($_POST['author']), 'UTF-8') < 3) {
+    } elseif (mb_strlen($author, 'UTF-8') < 3) {
         $invalidInputAuthor = 'حداقل 3 کاراکتر باشد';
-    } elseif (mb_strlen(trim($_POST['author']), 'UTF-8') > 20) {
+    } elseif (mb_strlen($author, 'UTF-8') > 20) {
         $invalidInputAuthor = 'حداکثر 20 کاراکتر باشد';
+    } elseif (!preg_match('/^[\p{L}0-9\s]+$/u', $author)) {
+        $invalidInputAuthor = 'فقط حروف و اعداد مجاز هستند';
     }
 
-    if (empty(trim($_POST['body']))) {
+    if (empty($body)) {
         $invalidInputBody = 'متن مقاله الزامی است';
-    } elseif (mb_strlen(trim($_POST['body']), 'UTF-8') < 10) {
+    } elseif (mb_strlen($body, 'UTF-8') < 10) {
         $invalidInputBody = 'حداقل 10 کاراکتر باشد';
-    } elseif (mb_strlen(trim($_POST['body']), 'UTF-8') > 1000) {
+    } elseif (mb_strlen($body, 'UTF-8') > 1000) {
         $invalidInputBody = 'حداکثر 1000 کاراکتر باشد';
+    } elseif (!preg_match('/^[\p{L}0-9\s]+$/u', $title)) {
+        $invalidInputBody = 'فقط حروف و اعداد مجاز هستند';
     }
 
-    if (!empty(trim($_POST['title'])) && !empty(trim($_POST['author'])) && !empty(trim($_POST['body']))) {
+    if (!empty($title) && !empty($author) && !empty($body)) {
         $title = htmlspecialchars($_POST['title']);
         $author = htmlspecialchars($_POST['author']);
         $body = htmlspecialchars($_POST['body']);
-        $categoryId = $_POST['categoryId'];
-        $imageId = $image['id'];
 
         if (!empty(trim($_FILES['image']['name']))) {
             $allowType = ['image/png', 'image/jpg', 'image/jpeg'];
