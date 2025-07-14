@@ -146,7 +146,7 @@ $categories = $db->query("SELECT * FROM categories LIMIT 5");
                                         <td><?= htmlspecialchars($category['id']) ?></td>
                                         <td><?= htmlspecialchars($category['title']) ?></td>
                                         <td>
-                                            <a href="#" class="btn btn-sm btn-outline-dark">ویرایش</a>
+                                            <a href="./pages/categories/edit.php?id=<?= htmlspecialchars($category['id']) ?>" class="btn btn-sm btn-outline-dark">ویرایش</a>
                                             <a href="index.php?entity=category&action=delete&id=<?= $category['id'] ?>" class="btn btn-sm btn-outline-danger">حذف</a>
                                         </td>
                                     </tr>
