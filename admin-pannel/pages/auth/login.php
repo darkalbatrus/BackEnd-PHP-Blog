@@ -7,17 +7,22 @@ $invalidInputEmail = '';
 $invalidInputPassword = '';
 
 if (isset($_POST['login'])) {
-    if (empty(trim($_POST['email']))) {
+    $email = trim($_POST['email']);
+    $password = trim($_POST['password']);
+
+    if (empty($email)) {
         $invalidInputEmail = "ایمیل ضروری است";
+    } elseif (mb_strlen($email) < 3) {
+        $invalidInputEmail = 'حداقل 3 کاراکتر باشد';
     }
 
-    if (empty(trim($_POST['password']))) {
+    if (empty($password)) {
         $invalidInputPassword = "رمز عبور ضروری است";
+    } elseif (mb_strlen($password) < 3) {
+        $invalidInputPassword = 'حداقل 3 کاراکتر باشد';
     }
 
-    if (!empty(trim($_POST['email'])) && !empty(trim($_POST['password']))) {
-        $email = $_POST['email'];
-        $password = $_POST['password'];
+    if (empty($invalidInputEmail) && empty($invalidInputPassword)) {
 
         $user = $db->prepare("SELECT * FROM users WHERE email=:email AND password=:password ");
         $user->execute(['email' => $email, 'password' => $password]);
