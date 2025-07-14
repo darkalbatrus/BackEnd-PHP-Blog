@@ -1,32 +1,33 @@
 <?php
 include "../../include/layout/header.php";
-
 $invalidInputTitle = '';
 
 if (isset($_POST['addCategory'])) {
-    if (empty(trim($_POST['title']))) {
-        $invalidInputTitle = "فیلد عنوان ضروری هست";
-    }
+    $title = trim($_POST['title']);
 
-    if (!empty(trim($_POST['title']))) {
-        $title = $_POST['title'];
-        $categoryInsert = $db->prepare("INSERT INTO categories (title) VALUES (:title )");
+    if (empty($title)) {
+        $invalidInputTitle = 'فیلد عنوان الزامی است';
+    } elseif (mb_strlen($title) < 3) {
+        $invalidInputTitle = 'حداقل 3 کاراکتر باشد';
+    } elseif (mb_strlen($title) > 20) {
+        $invalidInputTitle = 'حداکثر 20 کاراکتر باشد';
+    } elseif (!preg_match('/^[\p{L}0-9\s]+$/u', $title)) {
+        $invalidInputTitle = 'فقط حروف و اعداد مجاز هستند';
+    } else {
+        $title = htmlspecialchars($title);
+
+        $categoryInsert = $db->prepare("INSERT INTO categories (title) VALUES (:title)");
         $categoryInsert->execute(['title' => $title]);
-
-        header("Location:index.php");
+        header("Location: index.php");
         exit();
     }
-
 }
-
 ?>
 
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar Section -->
-        <?php
-        include "../../include/layout/sidebar.php"
-        ?>
+        <?php include "../../include/layout/sidebar.php"; ?>
 
         <!-- Main Section -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
@@ -44,9 +45,7 @@ if (isset($_POST['addCategory'])) {
                     </div>
 
                     <div class="col-12">
-                        <button name="addCategory" type="submit" class="btn btn-dark">
-                            ایجاد
-                        </button>
+                        <button name="addCategory" type="submit" class="btn btn-dark">ایجاد</button>
                     </div>
                 </form>
             </div>
@@ -54,6 +53,4 @@ if (isset($_POST['addCategory'])) {
     </div>
 </div>
 
-<?php
-include "../../include/layout/footer.php"
-?>
+<?php include "../../include/layout/footer.php"; ?>
