@@ -7,45 +7,90 @@ if (isset($_GET['id'])) {
     $post->execute(['id' => $postId]);
     $post = $post->fetch();
     $categories = $db->query("SELECT * FROM categories");
+    $image = $db->prepare("SELECT * FROM files WHERE id=:id");
+    $image->execute(['id' => $post['file_id']]);
+    $image = $image->fetch();
+    // echo "<pre>";
+    // print_r($image);
 }
 
 $invalidInputTitle = '';
 $invalidInputAuthor = '';
 $invalidInputBody = '';
+$invalidInputImage = '';
+
 if (isset($_POST['editPost'])) {
     if (empty(trim($_POST['title']))) {
         $invalidInputTitle = 'فیلد عنوان الزامی است';
+    } elseif (mb_strlen(trim($_POST['title'])) < 3) {
+        $invalidInputTitle = 'حداقل 3 کاراکتر باشد';
+    } elseif (mb_strlen(trim($_POST['title'])) > 20) {
+        $invalidInputTitle = 'حداکثر 20 کاراکتر باشد';
     }
+
     if (empty(trim($_POST['author']))) {
         $invalidInputAuthor = 'فیلد نام نویسنده الزامی است';
+    } elseif (mb_strlen(trim($_POST['author'])) < 3) {
+        $invalidInputAuthor = 'حداقل 3 کاراکتر باشد';
+    } elseif (mb_strlen(trim($_POST['author'])) > 20) {
+        $invalidInputAuthor = 'حداکثر 20 کاراکتر باشد';
     }
+
     if (empty(trim($_POST['body']))) {
         $invalidInputBody = 'متن مقاله الزامی است';
+    } elseif (mb_strlen(trim($_POST['body'])) < 10) {
+        $invalidInputBody = 'حداقل 10 کاراکتر باشد';
+    } elseif (mb_strlen(trim($_POST['body'])) > 1000) {
+        $invalidInputBody = 'حداکثر 1000 کاراکتر باشد';
     }
+
     if (!empty(trim($_POST['title'])) && !empty(trim($_POST['author'])) && !empty(trim($_POST['body']))) {
         $title = $_POST['title'];
         $author = $_POST['author'];
         $body = $_POST['body'];
         $categoryId = $_POST['categoryId'];
+        $imageId = $image['id'];
 
         if (!empty(trim($_FILES['image']['name']))) {
-            $nameImage = time() . "_" . $_FILES['image']['name'];
-            $tmpName = $_FILES['image']['tmp_name'];
+            $allowType = ['image/png', 'image/jpg', 'image/jpeg'];
+            $fileType = mime_content_type($_FILES['image']['tmp_name']);
 
-            if (move_uploaded_file($tmpName, "../../../uploads/posts/$nameImage")) {
-                $postUpdate = $db->prepare("UPDATE posts SET title =:title, author=:author, category_id=:categoryId, body=:body, image=:image WHERE id=:id");
-                $postUpdate->execute(['title' => $title, 'author' => $author, 'categoryId' => $categoryId, 'body' => $body, 'id' => $postId, 'image' => $nameImage]);
+            if (!in_array($fileType, $allowType)) {
+                $invalidInputImage = 'فرمت عکس معتبر نیست';
             } else {
-                echo "Upload Error";
+                $fileSize = $_FILES['image']['size'];
+
+                if ($fileSize < 1 * 1024 * 1024) {
+                    $invalidInputImage = "حداقل سایز عکس 1 مگابایت باشد";
+                } elseif ($fileSize > 10 * 1024 * 1024) {
+                    $invalidInputImage = "حداکثر سایز عکس 10 مگابایت باشد";
+                } elseif (empty($invalidInputImage)) {
+                    $imgName = time() . "-" . basename($_FILES['image']['name']);
+                    $imgType = $_FILES['image']['type'];
+                    $imgSize = $_FILES['image']['size'];
+                    $tmpName = $_FILES['image']['tmp_name'];
+
+                    if (move_uploaded_file($tmpName, "../../../uploads/posts/$imgName")) {
+                        unlink("../../../uploads/posts/{$image['name']}");
+
+                        $imgUpdate = $db->prepare("UPDATE files SET name=:name,size=:size,type=:type WHERE id=:id");
+                        $imgUpdate->execute(['name' => $imgName, 'type' => $imgType, 'size' => $imgSize, 'id' => $imageId]);
+
+                        $postUpdate = $db->prepare("UPDATE posts SET title =:title, author=:author, category_id=:categoryId, body=:body WHERE id=:id");
+                        $postUpdate->execute(['title' => $title, 'author' => $author, 'categoryId' => $categoryId, 'body' => $body, 'id' => $postId]);
+                    } else {
+                        echo "Upload Error";
+                    }
+                }
             }
         } else {
             $postUpdate = $db->prepare("UPDATE posts SET title =:title, author=:author, category_id=:categoryId, body=:body WHERE id=:id");
             $postUpdate->execute(['title' => $title, 'author' => $author, 'categoryId' => $categoryId, 'body' => $body, 'id' => $postId]);
         }
-
-
-        header("Location:index.php");
-        exit();
+        if (empty($invalidInputTitle) && empty($invalidInputAuthor) && empty($invalidInputImage) && empty($invalidInputBody)) {
+            header("Location:index.php");
+            exit();
+        }
     }
 }
 
@@ -105,6 +150,7 @@ if (isset($_POST['editPost'])) {
                     <div class="col-12 col-sm-6 col-md-4">
                         <label for="formFile" class="form-label">تصویر مقاله</label>
                         <input class="form-control" name="image" type="file" />
+                        <div class="form-text text-danger"><?= $invalidInputImage ?></div>
                     </div>
 
                     <div class="col-12">
@@ -117,7 +163,7 @@ if (isset($_POST['editPost'])) {
 
 
                     <div class="col-12 col-sm-6 col-md-4">
-                        <img class="rounded" src="../../../uploads/posts/<?= $post['image'] ?>" width="300" />
+                        <img class="rounded" src="../../../uploads/posts/<?= $image['name'] ?>" width="300" />
                     </div>
 
                     <div class="col-12">
