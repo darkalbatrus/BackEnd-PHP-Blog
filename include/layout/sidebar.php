@@ -1,5 +1,36 @@
 <?php
 $categories = $db->query("SELECT * FROM categories");
+$emails = $db->query("SELECT email FROM subscribers");
+$emails = $emails->fetchAll(PDO::FETCH_COLUMN);
+
+$invalidInputName = '';
+$invalidInputEmail = '';
+$successMessage = '';
+
+if (isset($_POST['subscribe'])) {
+  $name = trim($_POST['name']);
+  $email = trim($_POST['email']);
+
+  if (empty($name)) {
+    $invalidInputName = 'فیلد نام نویسنده الزامی است';
+  } elseif (mb_strlen($name) < 3) {
+    $invalidInputName = 'حداقل 3 کاراکتر باشد';
+  } elseif (mb_strlen($name) > 20) {
+    $invalidInputName = 'حداکثر 20 کاراکتر باشد';
+  } elseif (!preg_match('/^[\p{L}0-9\s]+$/u', $name)) {
+    $invalidInputName = 'فقط حروف و اعداد مجاز هستند';
+  }
+
+  if (empty(trim($_POST['email']))) {
+    $invalidInputEmail = "فیلد ایمیل الزامی است";
+  } elseif (in_array($email, $emails)) {
+    $invalidInputEmail = "ایمیل قبلا ثبت شده!";
+  } elseif (empty($invalidInputEmail)) {
+    $subscribeInsert = $db->prepare("INSERT INTO subscribers (name,email) VALUES (:name,:email)");
+    $subscribeInsert->execute(['name' => $name, 'email' => $email]);
+    $successMessage = "عضویت شما با موفقیت انجام شد";
+  }
+}
 ?>
 
 
@@ -45,26 +76,6 @@ $categories = $db->query("SELECT * FROM categories");
     </ul>
   </div>
 
-  <?php
-  $invalidInputName = '';
-  $invalidInputEmail = '';
-  $successMessage = '';
-
-  if (isset($_POST['subscribe'])) {
-    if (empty(trim($_POST['name']))) {
-      $invalidInputName = "فید نام الزامی است";
-    } elseif (empty(trim($_POST['email']))) {
-      $invalidInputEmail = "فید ایمیل الزامی است";
-    } else {
-      $name = $_POST['name'];
-      $email = $_POST['email'];
-      $subscribeInsert = $db->prepare("INSERT INTO subscribers (name,email) VALUES (:name,:email)");
-      $subscribeInsert->execute(['name' => $name, 'email' => $email]);
-
-      $successMessage = "عضویت شما با موفقیت انجام شد";
-    }
-  }
-  ?>
   <!-- Subscribue Section -->
   <div class="card mt-4">
     <div class="card-body">
