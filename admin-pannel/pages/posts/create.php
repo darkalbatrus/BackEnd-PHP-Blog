@@ -16,6 +16,8 @@ if (isset($_POST['addPost'])) {
         $invalidInputTitle = 'حداقل 3 کاراکتر باشد';
     } elseif (mb_strlen(trim($_POST['title'])) > 20) {
         $invalidInputTitle = 'حداکثر 20 کاراکتر باشد';
+    } elseif (!preg_match('/^[\p{L}0-9\s]+$/u', $_POST['title'])) {
+        $invalidInputTitle = 'فقط حروف و اعداد مجاز هستند';
     }
 
     if (empty(trim($_POST['author']))) {
@@ -24,7 +26,10 @@ if (isset($_POST['addPost'])) {
         $invalidInputAuthor = 'حداقل 3 کاراکتر باشد';
     } elseif (mb_strlen(trim($_POST['author'])) > 20) {
         $invalidInputAuthor = 'حداکثر 20 کاراکتر باشد';
+    } elseif (!preg_match('/^[\p{L}0-9\s]+$/u', $_POST['author'])) {
+        $invalidInputAuthor = 'فقط حروف و اعداد مجاز هستند';
     }
+
 
     if (empty(trim($_FILES['image']['name']))) {
         $invalidInputImage = 'عکس مقاله الزامی است';
@@ -52,7 +57,10 @@ if (isset($_POST['addPost'])) {
         $invalidInputBody = 'حداقل 10 کاراکتر باشد';
     } elseif (mb_strlen(trim($_POST['body'])) > 1000) {
         $invalidInputBody = 'حداکثر 1000 کاراکتر باشد';
+    } elseif (!preg_match('/^[\p{L}0-9\s]+$/u', $_POST['body'])) {
+        $invalidInputBody = 'فقط حروف و اعداد مجاز هستند';
     }
+
 
     if (empty($invalidInputTitle) && empty($invalidInputAuthor) && empty($invalidInputImage) && empty($invalidInputBody)) {
         $title = htmlspecialchars($_POST['title']);
